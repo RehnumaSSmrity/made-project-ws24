@@ -27,7 +27,7 @@ Sample Data URL: [https://offenedaten-koeln.de/sites/default/files/Fahrrad_Zaehl
 Data Type: CSV
 
 
-#Datasource2: Weather and Climate Data of Köln
+#Datasource2: Weather and Climate Data of Hamburg
 
 Metadata URL: https://dev.meteostat.net/bulk/monthly.html
 
