@@ -2,11 +2,10 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 
-
 class DataPipeline:
     def __init__(self) -> None:
         # Define the data source URL and the destination database URL
-        self.data_url = "/Users/rehnuma/Downloads/rhein-kreis-neuss-flughafen-weltweit.csv"
+        self.data_url = "https://opendata.rhein-kreis-neuss.de/api/v2/catalog/datasets/rhein-kreis-neuss-flughafen-weltweit/exports/csv"
         self.database_url = "sqlite:///airports.sqlite"
    
     def extract(self):
