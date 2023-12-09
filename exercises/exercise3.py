@@ -32,4 +32,4 @@ for fuel in fuel_types:
     vehicle_data = vehicle_data[vehicle_data[fuel] > 0]
 
 # Save the transformed data to a SQLite database
-vehicle_data.to_sql('vehicle_registry', 'sqlite:///vehicle_registry.sqlite', if_exists='replace', index=False)
+vehicle_data.to_sql('vehicle_registry', 'sqlite:///cars.sqlite', if_exists='replace', index=False)
