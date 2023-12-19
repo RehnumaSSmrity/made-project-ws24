@@ -54,6 +54,7 @@ if __name__ == "__main__":
         names=None,
         dtype=bike_file_dtype,
         transform=transform_bike,
+        encoding='latin-1',
     )
     bike_data_source = DataSource(
         data_name="bike sharing data",
@@ -98,10 +99,11 @@ if __name__ == "__main__":
         sep=",",
         names=None,
         dtype=air_file_dtype,
+        encoding='latin-1',
     )
     air_data_source = DataSource(
         data_name="Air Pollution in Seoul",
-        url="hhttps://www.kaggle.com/datasets/bappekim/air-pollution-in-seoul",
+        url="https://www.kaggle.com/datasets/bappekim/air-pollution-in-seoul",
         source_type=DataSource.KAGGLE_DATA,
         files=(air_file,),
     )
