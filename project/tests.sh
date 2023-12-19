@@ -1,2 +1,2 @@
 #!/bin/bash
-pytest test.py -rA
+python -m unittest test.py

@@ -3,12 +3,15 @@ import os
 import sqlite3
 import numpy as np
 import pandas as pd
+import warnings
 from main.authpipeline import ETLPipeline, DataSource, CSVFile, SQLiteDB
+
+warnings.filterwarnings('ignore')
 
 class TestDatasetProcessing(unittest.TestCase):
     def setUp(self):
         # You can modify this path based on your project structure
-        self.base_path = r'\Users\rehnuma\Documents\GitHub\made-project-ws24\Project'
+        self.base_path = os.path.dirname(os.path.abspath(__file__))
 
     def test_bike_pipeline(self):
         # Bike Sharing Data Pipeline Test

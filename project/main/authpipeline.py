@@ -121,8 +121,8 @@ class DataSource:
     def _download_kaggle_zip_file(self, output_dir: str) -> None:
         try:
             # Construct Kaggle API key file path
-            BASE_DIR = os.getcwd()
-            kaggle_info_path = os.path.join(BASE_DIR, "main", "kaggle.json")
+            kaggle_info_path = "kaggle.json"
+            print(kaggle_info_path)
 
             # Load Kaggle API key from the file
             with open(kaggle_info_path) as f:
