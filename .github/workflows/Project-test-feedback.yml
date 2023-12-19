@@ -1,0 +1,34 @@
+name: Project tests
+on: 
+  push:
+    paths:
+      - 'project/**'
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+    branches:
+      - main
+
+jobs:
+  Project-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up python 3.11
+        uses: actions/setup-python@v4
+        with:
+            python-version: 3.11
+
+      - name: Install requirements
+        run: |
+          pip install -r requirements.txt
+          
+      - name: Run tests
+        run: |
+          cd project
+          chmod +x tests.sh
+          ./tests.sh
