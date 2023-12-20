@@ -79,14 +79,14 @@ if __name__ == "__main__":
         output_directory=data_directory,
     )
     air_file_dtype = {
-        "Measurement date": "str",
+        "Measurement date": str,
         "Station code": float,
-        "Address": "str",
-        "Latitude": "int64",
-        "Longitude": "int64",
-        "SO2": np.float64,
-        "NO2": np.float64,
-        "O3": np.float64,
+        "Address": str,
+        "Latitude": float,
+        "Longitude": float,
+        "SO2": float,
+        "NO2": float,
+        "O3": float,
         "CO": float,
         "PM10": float,
         "PM2.5": float,
@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
     
     air_file = CSVFile(
-        file_name="Measurement_summary.csv",
+        file_name=os.path.join('AirPollutionSeoul','Measurement_summary.csv'),
         sep=",",
         names=None,
         dtype=air_file_dtype,

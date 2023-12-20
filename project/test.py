@@ -68,23 +68,23 @@ class TestDatasetProcessing(unittest.TestCase):
     def test_weather_pipeline(self):
         # Air Pollution in Seoul Data Pipeline Test
         data_source = DataSource(
-            data_name="Air Pollution in Seoul",
-            url="https://www.kaggle.com/datasets/bappekim/air-pollution-in-seoul",
+            data_name="Air polluation data",
+            url="https://www.kaggle.com/datasets/bappekim/air-pollution-in-seoul?select=Measurement_summary.csv",
             source_type=DataSource.KAGGLE_DATA,
             files=(CSVFile(
-                file_name="Measurement_summary.csv",
+                file_name=os.path.join('AirPollutionSeoul','Measurement_summary.csv'),
                 encoding='latin-1',
                 sep=",",
                 names=None,
                 dtype={
-                    "Measurement date": "str",
+                    "Measurement date": str,
                     "Station code": float,
-                    "Address": "str",
-                    "Latitude": "int64",
-                    "Longitude": "int64",
-                    "SO2": np.float64,
-                    "NO2": np.float64,
-                    "O3": np.float64,
+                    "Address": str,
+                    "Latitude": float,
+                    "Longitude": float,
+                    "SO2": float,
+                    "NO2": float,
+                    "O3": float,
                     "CO": float,
                     "PM10": float,
                     "PM2.5": float,

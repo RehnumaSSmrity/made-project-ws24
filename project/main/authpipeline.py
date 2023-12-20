@@ -8,13 +8,14 @@ from urllib.request import urlretrieve
 from tqdm import tqdm
 import json
 import os
+import warnings
 
 # Third-party imports
 import pandas as pd
 import opendatasets as od
 
 # Self imports
-
+warnings.filterwarnings('ignore')
 
 class SQLiteDB:
     FAIL = "fail"
