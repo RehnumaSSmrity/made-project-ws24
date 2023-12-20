@@ -103,7 +103,7 @@ if __name__ == "__main__":
     )
     air_data_source = DataSource(
         data_name="Air Pollution in Seoul",
-        url="https://www.kaggle.com/datasets/bappekim/air-pollution-in-seoul",
+        url="https://www.kaggle.com/datasets/bappekim/air-pollution-in-seoul/?select=Measurement_summary.csv",
         source_type=DataSource.KAGGLE_DATA,
         files=(air_file,),
     )
