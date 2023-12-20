@@ -1,4 +1,4 @@
 #!/bin/bash
 
-#Test
+#Test run code
 python -m unittest test.py
