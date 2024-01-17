@@ -43,4 +43,9 @@ Content: This data provides average values for six pollutants (SO2, NO2, CO, O3,
 
 ## Work Packages
 
-1. 
+1. Investigate for interesting dataset. #1
+2. Write initial Description about the project plan. #2
+3. Construct ETL Pipeline. #3
+4. Create test cases for ETL Pipeline. #4
+5. Project Tests Pipeline for the Project #5
+6. Final Report and Presentation Submission #6
