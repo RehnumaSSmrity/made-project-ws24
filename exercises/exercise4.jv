@@ -7,41 +7,42 @@ transform TemperatureConversion {
     fahrenheitTemperature: (celsiusTemperature * 9/5) + 32;
 }
 
+// Main data processing pipeline for weather data
 pipeline WeatherDataProcessingPipeline {
-    // Step 1: Extract weather data from a specified URL
+    // Step 1: Extracts weather data from a specified URL
     block DataExtractor oftype HttpExtractor {
         url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
     }
 
-    // Step 2: Interpret the downloaded file as a ZIP archive
+    // Step 2: Interprets the downloaded file as a ZIP archive
     block ZipInterpreter oftype ArchiveInterpreter {
         archiveType: "zip";
     }
 
-    // Step 3: Pick a specific file from the extracted contents
+    // Step 3: Picks a specific file from the extracted contents
     block FilePicker oftype FilePicker {
         path: "/data.csv";
     }
 
-    // Step 4: Interpret the chosen file as a CSV file
+    // Step 4: Interprets the chosen file as a CSV file
     block CSVInterpreter oftype CSVInterpreter {
         delimiter: ';';
     }
 
-    // Step 5: Interpret the chosen file as a plain text file
+    // Step 5: Interprets the chosen file as a plain text file
     block TextFileInterpreter oftype TextInterpreter {}
 
-    // Step 6: Delete specified columns from the data
+    // Step 6: Deletes specified columns from the data
     block ColumnDeleter oftype ColumnDeleter {
         delete: [column F, column G, column H, column I];
     }
 
-    // Step 7: Select a range of cells from the data
+    // Step 7: Selects a range of cells from the data
     block CellRangeSelector oftype CellRangeSelector {
         select: range A1:K*;
     }
 
-    // Step 8: Interpret the selected data as a table without headers
+    // Step 8: Interprets the selected data as a table without headers
     block TableInterpreter oftype TableInterpreter {
         header: false;
         columns: [
@@ -55,21 +56,21 @@ pipeline WeatherDataProcessingPipeline {
         ];
     }
 
-    // Step 9: Apply the temperature conversion transformation to the 'Temperature' column
+    // Step 9: Applies the temperature conversion transformation to the 'Temperature' column
     block TemperatureTransformerA oftype TableTransformer {
         inputColumns: ['Temperature'];
         outputColumn: 'Temperature';
-        use: TemperatureConversion;  // Use the defined transformation
+        use: TemperatureConversion;  // Apply the defined temperature conversion
     }
 
-    // Step 10: Apply the temperature conversion transformation to the 'BatteryTemperature' column
+    // Step 10: Applies the temperature conversion transformation to the 'BatteryTemperature' column
     block TemperatureTransformerB oftype TableTransformer {
         inputColumns: ['BatteryTemperature'];
         outputColumn: 'BatteryTemperature';
-        use: TemperatureConversion;  // Use the defined transformation
+        use: TemperatureConversion;  // Apply the defined temperature conversion
     }
 
-    // Step 11: Load the processed data into an SQLite table
+    // Step 11: Loads the processed data into an SQLite table
     block DatabaseLoader oftype SQLiteLoader {
         table: "temperatures";
         file: "./temperatures.sqlite";
