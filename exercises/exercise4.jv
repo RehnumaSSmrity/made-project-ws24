@@ -1,5 +1,5 @@
 // Transformation definition to convert Celsius to Fahrenheit
-transform TemperatureConverter {
+transform TemperatureConversion {
     from celsiusTemperature oftype decimal;
     to fahrenheitTemperature oftype decimal;
 
@@ -7,41 +7,41 @@ transform TemperatureConverter {
     fahrenheitTemperature: (celsiusTemperature * 9/5) + 32;
 }
 
-pipeline WeatherDataPipeline {
-    // Extracts weather data from a specified URL
+pipeline WeatherDataProcessingPipeline {
+    // Step 1: Extract weather data from a specified URL
     block DataExtractor oftype HttpExtractor {
         url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
     }
 
-    // Interprets the downloaded file as a ZIP archive
+    // Step 2: Interpret the downloaded file as a ZIP archive
     block ZipInterpreter oftype ArchiveInterpreter {
         archiveType: "zip";
     }
 
-    // Picks a specific file from the extracted contents
+    // Step 3: Pick a specific file from the extracted contents
     block FilePicker oftype FilePicker {
         path: "/data.csv";
     }
 
-    // Interprets the chosen file as a CSV file
+    // Step 4: Interpret the chosen file as a CSV file
     block CSVInterpreter oftype CSVInterpreter {
         delimiter: ';';
     }
 
-    // Interprets the chosen file as a plain text file
+    // Step 5: Interpret the chosen file as a plain text file
     block TextFileInterpreter oftype TextInterpreter {}
 
-    // Deletes specified columns from the data
+    // Step 6: Delete specified columns from the data
     block ColumnDeleter oftype ColumnDeleter {
         delete: [column F, column G, column H, column I];
     }
 
-    // Selects a range of cells from the data
+    // Step 7: Select a range of cells from the data
     block CellRangeSelector oftype CellRangeSelector {
         select: range A1:K*;
     }
 
-    // Interprets the selected data as a table without headers
+    // Step 8: Interpret the selected data as a table without headers
     block TableInterpreter oftype TableInterpreter {
         header: false;
         columns: [
@@ -55,24 +55,24 @@ pipeline WeatherDataPipeline {
         ];
     }
 
-    // Applies the temperature conversion transformation to the 'Temperature' column
+    // Step 9: Apply the temperature conversion transformation to the 'Temperature' column
     block TemperatureTransformerA oftype TableTransformer {
         inputColumns: ['Temperature'];
         outputColumn: 'Temperature';
-        use: TemperatureConverter;  // Using the defined transformation
+        use: TemperatureConversion;  // Use the defined transformation
     }
 
-    // Applies the temperature conversion transformation to the 'BatteryTemperature' column
+    // Step 10: Apply the temperature conversion transformation to the 'BatteryTemperature' column
     block TemperatureTransformerB oftype TableTransformer {
         inputColumns: ['BatteryTemperature'];
         outputColumn: 'BatteryTemperature';
-        use: TemperatureConverter;  // Using the defined transformation
+        use: TemperatureConversion;  // Use the defined transformation
     }
 
-    // Loads the processed data into an SQLite table
+    // Step 11: Load the processed data into an SQLite table
     block DatabaseLoader oftype SQLiteLoader {
-        table: "temperature_data";
-        file: "./temperature_data.sqlite";
+        table: "temperatures";
+        file: "./temperatures.sqlite";
         dropTable: false;
     }
 
