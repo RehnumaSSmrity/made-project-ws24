@@ -1,92 +1,104 @@
-// Transformation definition to convert Celsius to Fahrenheit
-transform TemperatureConversion {
-    from celsiusTemperature oftype decimal;
-    to fahrenheitTemperature oftype decimal;
+// Battery data processing pipeline
+pipeline BatteryPipeline { 
 
-    // Conversion formula
-    fahrenheitTemperature: (celsiusTemperature * 9/5) + 32;
-}
-
-// Main data processing pipeline for weather data
-pipeline WeatherDataProcessingPipeline {
-    // Step 1: Extracts weather data from a specified URL
-    block DataExtractor oftype HttpExtractor {
+    // Step 1: Extract battery data from the specified URL
+    block BatteryExtractor oftype HttpExtractor {
         url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
-    }
-
-    // Step 2: Interprets the downloaded file as a ZIP archive
-    block ZipInterpreter oftype ArchiveInterpreter {
+    } 
+    
+    // Step 2: Interpret the downloaded file as a ZIP archive
+    block BatteryArchiveInterpreter oftype ArchiveInterpreter {
         archiveType: "zip";
+    } 
+    
+    // Step 3: Pick the battery data file from the extracted contents
+    block BatteryFilePicker oftype FilePicker {
+        path: "/data.csv"; 
     }
 
-    // Step 3: Picks a specific file from the extracted contents
-    block FilePicker oftype FilePicker {
-        path: "/data.csv";
+    // Step 4: Interpret the battery data file as a plain text file
+    block BatteryFileInterpreter oftype TextFileInterpreter{
+
+    }
+     
+    // Step 5: Interpret the battery data file as a CSV file
+    block BatteryCSVInterpreter oftype CSVInterpreter {
+        delimiter: ";";
+    }
+    
+    // Step 6: Rename the 'Temperatur' cell header to match the desired column name
+    block RenameTemperaturCellWriter oftype CellWriter {
+        at: cell E1;
+        write: ["Temperatur"]; 
     }
 
-    // Step 4: Interprets the chosen file as a CSV file
-    block CSVInterpreter oftype CSVInterpreter {
-        delimiter: ';';
-    }
+    // Step 7: Rename the 'Batterietemperatur' cell header to match the desired column name
+    block RenameTemperaturBatteryCellWriter oftype CellWriter {
+        at: cell J1;
+        write: ["Batterietemperatur"]; 
+    }  
 
-    // Step 5: Interprets the chosen file as a plain text file
-    block TextFileInterpreter oftype TextInterpreter {}
-
-    // Step 6: Deletes specified columns from the data
-    block ColumnDeleter oftype ColumnDeleter {
-        delete: [column F, column G, column H, column I];
-    }
-
-    // Step 7: Selects a range of cells from the data
-    block CellRangeSelector oftype CellRangeSelector {
-        select: range A1:K*;
-    }
-
-    // Step 8: Interprets the selected data as a table without headers
-    block TableInterpreter oftype TableInterpreter {
-        header: false;
+    // Step 8: Interpret the battery data as a table with specified columns and constraints
+    block BatterieTableInterpreter oftype TableInterpreter { 
+        header: true;
         columns: [
-            "DeviceId" oftype integer,
-            "Manufacturer" oftype text,
-            "Model" oftype text,
-            "Month" oftype integer,
-            "Temperature" oftype decimal,
-            "BatteryTemperature" oftype decimal,
-            "DeviceActive" oftype text,
+            "Geraet" oftype ValidGeraetNumber,
+            "Hersteller" oftype text, 
+            "Model" oftype text, 
+            "Monat" oftype integer, 
+            "Temperatur" oftype decimal, 
+            "Batterietemperatur" oftype decimal, 
+            "Geraet aktiv" oftype text, 
         ];
+    } 
+     
+    // Step 9: Define transformation to convert Celsius to Fahrenheit
+    transform CelsiusToFahrenheit {
+        from Celsius oftype decimal;
+        to Fahrenheit oftype decimal;
+        Fahrenheit: (Celsius * 1.8) + 32;
+    } 
+
+    // Step 10: Apply temperature conversion to the 'Temperatur' column
+    block CelsiusToFahrenheitTransformer oftype TableTransformer {
+        inputColumns: ['Temperatur'];
+        outputColumn: 'Temperatur';
+        use: CelsiusToFahrenheit;
     }
 
-    // Step 9: Applies the temperature conversion transformation to the 'Temperature' column
-    block TemperatureTransformerA oftype TableTransformer {
-        inputColumns: ['Temperature'];
-        outputColumn: 'Temperature';
-        use: TemperatureConversion;  // Apply the defined temperature conversion
-    }
+    // Step 11: Apply temperature conversion to the 'Batterietemperatur' column
+    block CelsiusToFahrenheitBatteryTransformer oftype TableTransformer {
+        inputColumns: ['Batterietemperatur'];
+        outputColumn: 'Batterietemperatur';
+        use: CelsiusToFahrenheit;
+    } 
 
-    // Step 10: Applies the temperature conversion transformation to the 'BatteryTemperature' column
-    block TemperatureTransformerB oftype TableTransformer {
-        inputColumns: ['BatteryTemperature'];
-        outputColumn: 'BatteryTemperature';
-        use: TemperatureConversion;  // Apply the defined temperature conversion
-    }
+    // Constraint: Ensure 'Geraet' (Device) numbers are valid positive integers
+    constraint ValidGeraetNumberRange on decimal:
+        value > 0;
 
-    // Step 11: Loads the processed data into an SQLite table
-    block DatabaseLoader oftype SQLiteLoader {
+    // Define a valid Geraet (Device) number as an integer with the specified constraints
+    valuetype ValidGeraetNumber oftype integer {
+        constraints: [ ValidGeraetNumberRange ];
+    } 
+    
+    // Step 12: Load the processed battery data into an SQLite table
+    block BatterieLoader oftype SQLiteLoader {
         table: "temperatures";
         file: "./temperatures.sqlite";
-        dropTable: false;
-    }
+    } 
 
     // Pipeline execution order
-    DataExtractor
-    -> ZipInterpreter
-    -> FilePicker
-    -> TextFileInterpreter
-    -> CSVInterpreter
-    -> CellRangeSelector
-    -> ColumnDeleter
-    -> TableInterpreter
-    -> TemperatureTransformerA
-    -> TemperatureTransformerB
-    -> DatabaseLoader;
-}
+    BatteryExtractor 
+    -> BatteryArchiveInterpreter
+    -> BatteryFilePicker
+    -> BatteryFileInterpreter
+    -> BatteryCSVInterpreter
+    -> RenameTemperaturCellWriter
+    -> RenameTemperaturBatteryCellWriter
+    -> BatterieTableInterpreter
+    -> CelsiusToFahrenheitTransformer
+    -> CelsiusToFahrenheitBatteryTransformer
+    -> BatterieLoader;
+
+} 
